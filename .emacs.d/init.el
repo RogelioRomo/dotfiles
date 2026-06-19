@@ -1,3 +1,7 @@
+(setq custom-file "~/.emacs.d/custom.el")
+(when (file-exists-p custom-file)
+  (load custom-file))
+
 ;;Better defaults
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1) ;;disable visible scrollbar
@@ -5,8 +9,17 @@
 (tooltip-mode -1) ;;disable tooltips
 (set-fringe-mode 10) ;;give some breathing room
 (menu-bar-mode -1) ;;disable the menu bar
-(display-line-numbers-mode 1) ;;enable line numbers
+;;(global-display-line-numbers-mode 1) ;;enable line numbers
+(setq display-line-numbers t) ;;enable line numbers only when needed
+(column-number-mode) ;;adds columns to the modeline
 (setq visible-bell t) ;;set up visible bell
+
+;;Disable line number for some modes
+;;(dolist (mode '(org-mode-hook
+;;		term-mode-hook
+;;		shell-mode-hook
+;;		eshell-mode-hook))
+;;  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 ;;Themes
 ;;(load-theme 'wombat)
@@ -33,7 +46,7 @@
   :diminish
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
+         ("TAB" . ivy-alt-done)	
          ("C-l" . ivy-alt-done)
          ("C-j" . ivy-next-line)
          ("C-k" . ivy-previous-line)
@@ -46,6 +59,10 @@
          ("C-d" . ivy-reverse-i-search-kill))
   :config
   (ivy-mode 1))
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
 
 ;;Counsel
 (use-package counsel
@@ -63,11 +80,47 @@
   :init (doom-modeline-mode 1))
 
 ;;Doom themes
-(use-package doom-themes
-  :ensure t
-  :custom
+(use-package doom-themes)
+;;  :ensure t
+;;  :custom
   ;; Global settings (defaults)
-  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
-  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
+;;  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;  :config
+;;  (load-theme 'doom-dark+ t))
+
+;;Visual studio code dark theme
+(use-package vscode-dark-plus-theme
+  :ensure t
   :config
-  (load-theme 'doom-dark+ t))
+  (load-theme 'vscode-dark-plus t))
+
+;;Rainbow delimiters
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+;;Which-key
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
+
+;;Projectile
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" .  projectile-command-map)
+  :init
+  (when (file-directory-p "~/Documents/repos")
+    (setq projectile-project-search-path '("~/Documents/repos")))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+;;Magit
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+(use-package org)
