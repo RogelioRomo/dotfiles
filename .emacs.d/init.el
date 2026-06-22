@@ -34,7 +34,7 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;;Initialize use-package on non-linux platforms
+;;Initialize use-package for non-linux platforms
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
@@ -46,7 +46,7 @@
   :diminish
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)	
+         ("TAB" . ivy-alt-done)
          ("C-l" . ivy-alt-done)
          ("C-j" . ivy-next-line)
          ("C-k" . ivy-previous-line)
@@ -123,4 +123,31 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-(use-package org)
+;;Org mode
+(defun efs/org-mode-setup ()
+  (org-indent-mode)
+  (visual-line-mode 1))
+
+(use-package org
+  :hook (org-mode . efs/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾"
+	org-hide-emphasis-markers t))
+;;  (setq org-agenda-files
+;;	'("~/Documents/repos/orgModeFiles/tasks.org")
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(defun efs/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+	visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . efs/org-mode-visual-fill))
+
+(setq initial-buffer-choice "~/Documents/repos/dotfiles/.emacs.d/dashboard.org")
